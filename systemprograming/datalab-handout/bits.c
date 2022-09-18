@@ -156,7 +156,6 @@ int tmin(void) {
     // 0000 0000 0000 0000 0000 0000 0000 0001
     // 1000 0000 0000 0000 0000 0000 0000 0000
   return 1 << 31;
-
 }
 //2
 /*
@@ -168,12 +167,13 @@ int tmin(void) {
  */
 
 // 0x7FFFFFFF = 0111 1111 1111 1111 1111 1111 1111 1111 return 1
-// two's complement number return 0 (start with 1
+// two's complement number return 0 (start with 1)
 
 int isTmax(int x) {
-    //
-    int temp =
-    return ;
+    int temp = x + 1; // temp : 1000 0000 0000 0000 0000 0000 0000 0000 (x is tmax)
+
+    // we have to make 0x00 and then return !0x00
+    return 2;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
