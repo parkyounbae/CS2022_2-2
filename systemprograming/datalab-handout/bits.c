@@ -170,21 +170,31 @@ int tmin(void) {
 // two's complement number return 0 (start with 1)
 
 int isTmax(int x) {
-    int temp = x + 1; // temp : 1000 0000 0000 0000 0000 0000 0000 0000 (x is tmax)
-
+    int temp = x + 1; // temp : 1000 0000 0000 0000 0000 0000 0000 0000 (if x is tmax)
     // we have to make 0x00 and then return !0x00
-    return 2;
+    // 1110 1111 0001 1110 true -> false
+    // 1111 0000 1111 0000 false -> true
+    // -1 ... !temp ^ temp (0000 ^ 1000 = 1000) = tmax (0001 ^ 0000 = 0001) = -1
+    return !(~(x + ((!temp) ^ temp)));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
- *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
+ *   Examples
+ *   allOddBits(0xFFFFFFFD) = 0 (1111 1111 1111 1111 1111 1111 1111 1101)
+ *   allOddBits(0xAAAAAAAA) = 1 (1010 1010 1010 1010 1010 1010 1010 1010)
+ *   allEvenBits(0x55555555)     0101 0101 0101 0101 0101 0101 0101 0101
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 12
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    // 1110 | 0101 = 1111, 1010 | 0101 = 1111
+    // 0110 | 0101 = 0111, 0000 | 0101 = 0101
+
+    // (alloddbit & 0xAA)
+    // make 0x00 and then return !0x00
+    return !(~(x|0x55555555));
 }
 /* 
  * negate - return -x 
