@@ -144,7 +144,7 @@ NOTES:
  */
 int bitXor(int x, int y) {
     // De Morgan's laws
-  return ~(x&y)&(~x&~y);
+  return ~(x&y)&~(~x&~y);
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -202,9 +202,14 @@ int allOddBits(int x) {
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
+ *
+ *   0101(5) -> 1010 -> 1011(-5)
+ *   1011(-5) -> 0100 -> 0101(5)
+ *
+ *
  */
 int negate(int x) {
-  return 2;
+  return (~x)+1;
 }
 //3
 /* 
