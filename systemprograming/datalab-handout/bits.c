@@ -236,9 +236,10 @@ int negate(int x) {
  *   0000 0001 0010 0011 0100 0101 0110 0111 , 1000 1001 / 1010 1011 1100 1101 1110 1111
  */
 int isAsciiDigit(int x) {
-    int isxOver3 = x & (~0x3f);
-    int isxStartWith0 = x & 0x08;
-    int isxStartWith100 = x & 0x03;
+    int isxOver3 = x & (~0x3f); // 0011 1111 -> 1100 0000
+    int isNot3 = (x & (~0x0f))^0x30;
+    int isxStartWith0 = x & 0x08; //0000 1000
+    int isxStartWith100 = x & 0x06; //0000 0110
 
     return (!isxOver3)&((!isxStartWith0)|(!isxStartWith100));
 }
