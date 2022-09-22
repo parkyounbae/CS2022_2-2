@@ -191,10 +191,14 @@ int isTmax(int x) {
 int allOddBits(int x) {
     // 1110 | 0101 = 1111, 1010 | 0101 = 1111
     // 0110 | 0101 = 0111, 0000 | 0101 = 0101
-
+    // 0x55 0101 0101
     // (alloddbit & 0xAA)
     // make 0x00 and then return !0x00
-    return !(~(x|0x55555555));
+    x = x | 0x55;
+    x = x | 0x55 << 8;
+    x = x | 0x55 << 16;
+    x = x | 0x55 << 24;
+    return !(~x);
 }
 /* 
  * negate - return -x 
@@ -214,15 +218,29 @@ int negate(int x) {
 //3
 /* 
  * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
+ * 0x30 = 0011 0000  0x39 = 0011 1001
  *   Example: isAsciiDigit(0x35) = 1.
  *            isAsciiDigit(0x3a) = 0.
  *            isAsciiDigit(0x05) = 0.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 15
  *   Rating: 3
+ *
+ *   30~39 까지의 수들만 0000 0000 으로 만들어서 !0x00 을 반환해야할듯
+ *   ~3f = 1100 0000
+ *   일단 앞자리는 0011 고정이니까 0011 & (~0x3F) = 0000 a 이 나와야함
+ *   0으로 시작하거나 100? 인 애들을 다 0으로 만들어 줘야함
+ *   2. 0으로 시작하는애들 x & 1000 = 0000 , 1000 / 1000 b
+ *   3. 100으로 시작하는 애들 x & 0110 = 0??0 , 0000 / 0??0 c
+ *   !a & ( !b | !c )
+ *   0000 0001 0010 0011 0100 0101 0110 0111 , 1000 1001 / 1010 1011 1100 1101 1110 1111
  */
 int isAsciiDigit(int x) {
-  return 2;
+    int isxOver3 = x & (~0x3f);
+    int isxStartWith0 = x & 0x08;
+    int isxStartWith100 = x & 0x03;
+
+    return (!isxOver3)&((!isxStartWith0)|(!isxStartWith100));
 }
 /* 
  * conditional - same as x ? y : z 
@@ -230,9 +248,15 @@ int isAsciiDigit(int x) {
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 3
+ *
+ *   x=false     !x = 0000 0001 / !!x = 0000 0000 ~(!!x)+1 = 0000 0000
+ *   x=true      !x = 0000 0000 / !!x = 0000 0001 ~(!!x)+1 = 1111 1111
+ *              (y) + (z) 형태인데 참 : y+0 , 거짓 : 0+z 꼴로 나오도록
+ *
+ *              true 일때 1111 false 일때 0000
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  return y&(~(!!x)+1) + z&(~(~(!!x)+1));
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -242,16 +266,30 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    // equal
+    int isEqual = !(~(x + ~y));
+
+    int isXMinus = (x >> 31) & 1;
+    int isYMinus = (y >> 31) & 1;
+    int X_Y = ((x + (~y +1)) >> 31) & 1;
+
+    return isEqual | (isXMinus & !isYMinus) | ~(isXMinus^isYMinus) & X_Y;
 }
 //4
 /* 
  * logicalNeg - implement the ! operator, using all of 
  *              the legal operators except !
+ *              !0011 = 0000
+ *              !0000 = 0001
  *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4 
+ *   Rating: 4
+ *
+ *
+ *   *   (~x + 1) = 0000 (if x is 0000 or result includes 1)
+ *
+ *   마지막  (???0 or ???1) & 0x01
  */
 int logicalNeg(int x) {
   return 2;
