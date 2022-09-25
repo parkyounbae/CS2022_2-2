@@ -74,8 +74,23 @@ order by T.name;
 -- 12. Amazon 특성을 가진 도시의 리더의 트레이너 이름을 출력하세요
 select name
 from Trainer
-where Trainer.id = 
+where Trainer.id in (
+select leader_id
+from Gym
+where city in (
+select name
+from City 
+where description = "Amazon"
+)
+);
 
+-- 13. 불속성 포켓몬을 가장 많이 잡은 트레이너의 id와, 그 트레이너가 잡은 불속성 포켓몬의 수를 출력하세
+select owner_id, count(*) as fireCount
+from CatchedPokemon left join Pokemon on CatchedPokemon.pid = Pokemon.id
+where type = "Fire"
+group by owner_id
+order by fireCount desc
+limit 1;
 
 
 
