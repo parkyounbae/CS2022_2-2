@@ -106,10 +106,38 @@ where type != "Fire";
 
 
 -- 16. 진화하면id가작아지는포켓몬의진화전이름을사전순으로출력하세요
+select name
+from Evolution join Pokemon on Evolution.before_id = Pokemon.id
+where before_id > after_id
+order by name;
+
 -- 17. 트레이너에게 잡힌 모든 물속성 포켓몬의 평균 레벨을 출력하세요
+select avg(level)
+from CatchedPokemon join Pokemon on CatchedPokemon.pid = Pokemon.id
+where type = "Water";
+
 -- 18. 체육관 리더가 잡은 모든 포켓몬 중 레벨이 가장 높은 포켓몬의 별명을 출력하세요
+select max(level)
+from CatchedPokemon join Gym on CatchedPokemon.owner_id = Gym.leader_id;
+
 -- 19. Blue city 출신 트레이너들 중 잡은 포켓몬들의 레벨의 평균이 가장 높은 트레이너의 이름을 사전순으로 출력하세요
+select name
+from
+(
+select name, avg(level)
+from CatchedPokemon join Trainer on CatchedPokemon.owner_id = Trainer.id
+where hometown = "Blue City"
+group by name
+) as tempTable
+order by name;
+
 -- 20. 같은 출신이 없는 트레이너들이 잡은 포켓몬중 진화가 가능하고 Electric 속성을 가진 포켓몬의 이름을 출력하세요
+with tempTable as (
+
+)
+
+
+
 -- 21. 관장들의 이름과 각 관장들이 잡은 포켓몬들의 레벨 합을 레벨 합의 내림차 순으로 출력하세요
 -- 22. 가장 트레이너가 많은 고향의 이름을 출력하세요.
 
