@@ -146,17 +146,25 @@ group by pokeName
 having count(*) < 2;
 
 -- 21. 관장들의 이름과 각 관장들이 잡은 포켓몬들의 레벨 합을 레벨 합의 내림차 순으로 출력하세요
-select sum(level)
-from (CatchedPokemon join Gym on CatchedPokemon.owner_id = Gym.leader_id as temp) join Trainer on 
+select name, sum(level)
+from CatchedPokemon join Gym on CatchedPokemon.owner_id = Gym.leader_id join Trainer on Trainer.id = owner_id
 group by owner_id
 order by sum(level) desc;
 
 -- 22. 가장 트레이너가 많은 고향의 이름을 출력하세요.
+select hometown
+from Trainer join ( select count(*), hometown
+from Trainer
+group by hometown
+) on Trainer.hometown = hometown
+group by hometown
+having count(*) = max(count(*));
+-- order by count(*) desc;
 
 
-
-
-
+select count(*), hometown
+from Trainer
+group by hometown
 
 -- 23. Sangnok City 출신 트레이너와 Brown City 출신 트레이너가 공통으로 잡은 포켓몬의 이름을 중복을 제거하여 사전순으로 출력
 -- 24. 이름이 P로 시작하는 포켓몬을 잡은 트레이너 중 상록 시티 출신인 트레이너의 이름을 사전순으로 모두 출력하세요
