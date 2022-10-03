@@ -145,27 +145,18 @@ select name as pokeName, pid, owner_id, type
 from CatchedPokemon join Pokemon on CatchedPokemon.pid = Pokemon.id
 where type = "Electric" and (pid in (
 select before_id
-from Evolution) or pid in (
-select after_id
-from Evolution))
+from Evolution) )
 ) as temp join Trainer on owner_id = Trainer.id
 )
 select pokeName
 from tempTable
-group by pokeName
-having count(*) < 2;
-
--- select pokeName, hometown
--- from (
--- select name as pokeName, pid, owner_id, type
--- from CatchedPokemon join Pokemon on CatchedPokemon.pid = Pokemon.id
--- where type = "Electric" and (pid in (
--- select before_id
--- from Evolution) or pid in (
--- select after_id
--- from Evolution))
--- ) as temp join Trainer on owner_id = Trainer.id;
-
+where hometown in (
+select hometown
+from Trainer 
+group by hometown 
+having count(*) < 2
+)
+group by pokeName;
 
 -- 21. 관장들의 이름과 각 관장들이 잡은 포켓몬들의 레벨 합을 레벨 합의 내림차 순으로 출력하세요
 select name, sum(level)
@@ -247,7 +238,7 @@ order by name;
 select name
 from Pokemon
 where id not in (
-select owner_id
+select pid
 from CatchedPokemon
 )
 order by name;
