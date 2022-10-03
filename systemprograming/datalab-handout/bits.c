@@ -143,7 +143,6 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-    // De Morgan's laws
   return ~(x&y)&~(~x&~y);
 }
 /* 
@@ -153,9 +152,9 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-    // 0000 0000 0000 0000 0000 0000 0000 0001
-    // 1000 0000 0000 0000 0000 0000 0000 0000
+
   return 1 << 31;
+
 }
 //2
 /*
@@ -165,36 +164,20 @@ int tmin(void) {
  *   Max ops: 10
  *   Rating: 1
  */
-
-// 0x7FFFFFFF = 0111 1111 1111 1111 1111 1111 1111 1111 return 1
-// two's complement number return 0 (start with 1)
-
 int isTmax(int x) {
-    int temp = x + 1; // temp : 1000 0000 0000 0000 0000 0000 0000 0000 (if x is tmax)
-    // we have to make 0x00 and then return !0x00
-    // 1110 1111 0001 1110 true -> false
-    // 1111 0000 1111 0000 false -> true
-    // -1 ... !temp ^ temp (0000 ^ 1000 = 1000) = tmax (0001 ^ 0000 = 0001) = -1
-    return !(~(x + ((!temp) ^ temp)));
+  int temp = x + 1;
+  return !(~(x + ((!temp) ^ temp)));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
- *   Examples
- *   allOddBits(0xFFFFFFFD) = 0 (1111 1111 1111 1111 1111 1111 1111 1101)
- *   allOddBits(0xAAAAAAAA) = 1 (1010 1010 1010 1010 1010 1010 1010 1010)
- *   allEvenBits(0x55555555)     0101 0101 0101 0101 0101 0101 0101 0101
+ *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 12
  *   Rating: 2
  */
 int allOddBits(int x) {
-    // 1110 | 0101 = 1111, 1010 | 0101 = 1111
-    // 0110 | 0101 = 0111, 0000 | 0101 = 0101
-    // 0x55 0101 0101
-    // (alloddbit & 0xAA)
-    // make 0x00 and then return !0x00
-    x = x | 0x55;
+   x = x | 0x55;
     x = x | 0x55 << 8;
     x = x | 0x55 << 16;
     x = x | 0x55 << 24;
@@ -206,11 +189,6 @@ int allOddBits(int x) {
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
- *
- *   0101(5) -> 1010 -> 1011(-5)
- *   1011(-5) -> 0100 -> 0101(5)
- *
- *
  */
 int negate(int x) {
   return (~x)+1;
@@ -218,30 +196,19 @@ int negate(int x) {
 //3
 /* 
  * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
- * 0x30 = 0011 0000  0x39 = 0011 1001
  *   Example: isAsciiDigit(0x35) = 1.
  *            isAsciiDigit(0x3a) = 0.
  *            isAsciiDigit(0x05) = 0.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 15
  *   Rating: 3
- *
- *   30~39 까지의 수들만 0000 0000 으로 만들어서 !0x00 을 반환해야할듯
- *   ~3f = 1100 0000
- *   일단 앞자리는 0011 고정이니까 0011 & (~0x3F) = 0000 a 이 나와야함
- *   0으로 시작하거나 100? 인 애들을 다 0으로 만들어 줘야함
- *   2. 0으로 시작하는애들 x & 1000 = 0000 , 1000 / 1000 b
- *   3. 100으로 시작하는 애들 x & 0110 = 0??0 , 0000 / 0??0 c
- *   !a & ( !b | !c )
- *   0000 0001 0010 0011 0100 0101 0110 0111 , 1000 1001 / 1010 1011 1100 1101 1110 1111
  */
 int isAsciiDigit(int x) {
-    int isxOver3 = x & (~0x3f); // 0011 1111 -> 1100 0000
-    int isNot3 = (x & (~0x0f))^0x30;
-    int isxStartWith0 = x & 0x08; //0000 1000
-    int isxStartWith100 = x & 0x06; //0000 0110
+  int isxNot3 = (x & (~0x0f))^0x30;
+    int isxStartWith0 = x & 0x08;
+    int isxStartWith100 = x & 0x06;
 
-    return (!isxOver3)&((!isxStartWith0)|(!isxStartWith100));
+    return (!isxNot3)&((!isxStartWith0)|(!isxStartWith100));
 }
 /* 
  * conditional - same as x ? y : z 
@@ -249,15 +216,9 @@ int isAsciiDigit(int x) {
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 3
- *
- *   x=false     !x = 0000 0001 / !!x = 0000 0000 ~(!!x)+1 = 0000 0000
- *   x=true      !x = 0000 0000 / !!x = 0000 0001 ~(!!x)+1 = 1111 1111
- *              (y) + (z) 형태인데 참 : y+0 , 거짓 : 0+z 꼴로 나오도록
- *
- *              true 일때 1111 false 일때 0000
  */
 int conditional(int x, int y, int z) {
-  return y&(~(!!x)+1) + z&(~(~(!!x)+1));
+  return (y&(~(!!x)+1)) + (z&(~(~(!!x)+1)));
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -267,8 +228,7 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    // equal
-    int isEqual = !(~(x + ~y));
+   int isEqual = !(~(x + ~y));
 
     int isXMinus = (x >> 31) & 1;
     int isYMinus = (y >> 31) & 1;
@@ -280,35 +240,79 @@ int isLessOrEqual(int x, int y) {
 /* 
  * logicalNeg - implement the ! operator, using all of 
  *              the legal operators except !
- *              !0011 = 0000
- *              !0000 = 0001
  *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4
- *
- *
- *   *   (~x + 1) = 0000 (if x is 0000 or result includes 1)
- *
- *   마지막  (???0 or ???1) & 0x01
+ *   Rating: 4 
+ * 
+ * last : (result) & 0x01 ... if x = true -> result = 0x00, x = false -> result = 0x01  
+ * (~x + 1)|x -> false->0000, true->1111
+ *  1000 0101 / 0101 1010
+ *  1111 1000
  */
 int logicalNeg(int x) {
-  return 2;
+  int temp = x | (~x + 1);
+  temp = temp >> 31;
+  return ~temp&0x01;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
- *  Examples: howManyBits(12) = 5
- *            howManyBits(298) = 10
- *            howManyBits(-5) = 4
- *            howManyBits(0)  = 1
- *            howManyBits(-1) = 1
- *            howManyBits(0x80000000) = 32
+ *  Examples: howManyBits(12) = 5 -> 0 1100(12) = 0101(5)
+ *            howManyBits(298) = 10 -> 01 0001 1000 
+ *            howManyBits(-5) = 4 -> 1011
+ *            howManyBits(0)  = 1./
+ *            howManyBits(-1) = 1 -> 1
+ *            howManyBits(0x80000000) = 32 -> 1000 0000 0000 ... 0000
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
  *  Rating: 4
+ * 
+ *  0000 0000 1001 0101 s=0
+ *  1111 1111 0110 1010
+ * x = 0000 0000 1001 0101 | 0000 0000 0000 0000 
+ * 8bits = 0
+ * 4bits = 0100
+ * x = 0000 1001
+ * 2bits = 0010
+ * x = 0000 0010
+ * 1bits = 0001
+ * x = 0001
+ * 0bits = 0001
+ * result = 1001
+ *  1000 0000 1001 0101 s=1
+ *  0111 1111 0110 1010 
+ * x = 0 | 0111 1111 0110 1010 ->neg flip
  */
 int howManyBits(int x) {
-  return 0;
+  int sign, bits16, bits8, bits4, bits2, bits1, bits0;
+
+
+  sign = x >> 31;
+  x = (sign&~x) | (~sign&x);
+
+  //int bits16;
+  bits16 = !!(x>>16) << 4;
+  x = x>>bits16;
+
+  //int bits8; 
+  bits8 = !!(x>>8) << 3;
+  x = x>>bits8;
+
+  //int bits4;
+  bits4 = !!(x>>4) << 2;
+  x = x>>bits4;
+
+  //int bits2;
+  bits2  = !!(x>>2) << 1;
+  x = x>>bits2;
+
+  //int bits1;
+  bits1 = !!(x>>1);
+  x = x>>bits1;
+
+  bits0 = x;
+  
+  return bits16 + bits8 + bits4 + bits2 + bits1 + bits0 + 1;
 }
 //float
 /* 
@@ -323,6 +327,24 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
+  int exp = (uf >> 23)&0xff;
+  int sign = (1 << 31) & uf;
+
+  if(exp == 0) {
+    return (uf << 1) | sign;
+  }
+
+  if(exp == 0xff) {
+    return uf;
+  }
+
+  exp = exp + 1;
+  if(exp == 0xff) {
+    return 0x7f800000 | sign;
+  } else {
+    int frac = uf & 0x7fffff;
+    return (frac | exp << 23) | sign;
+  }
   return 2;
 }
 /* 
@@ -338,7 +360,42 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  int exp, sign, frac, expMinusBia, fracAdd1;
+
+  exp = (uf >> 23)&0xff;
+  sign = (1 << 31) & uf;
+  frac = uf & 0x7fffff;
+  if(exp == 0xff) {
+      return 0x80000000u;
+  }
+  if(exp == 0x0) {
+    return 0;
+  }
+
+  expMinusBia = exp - 127;
+  fracAdd1 = frac | 0x800000;
+
+  if(expMinusBia > 31) {
+    return 0x80000000;
+  }
+
+  if(expMinusBia < 0) {
+    return 0;
+  }
+
+  if(expMinusBia > 23) {
+    fracAdd1 <<= (expMinusBia -23);
+  } else {
+    fracAdd1 >>= (23 - expMinusBia);
+  }
+
+  if (sign) {
+    return ~fracAdd1 + 1;
+  } else if (fracAdd1 >> 31) {
+    return 0x80000000;
+  } else {
+    return fracAdd1;
+  }
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -354,5 +411,11 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  if (x < -150)
+    return 0;
+  if (x <= -127)
+    return 1 << (127 + x);
+  if (x <= 128)
+    return (x + 127) << 23;
+  return 0x7f800000;
 }
