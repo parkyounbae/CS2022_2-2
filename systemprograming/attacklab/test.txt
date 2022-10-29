@@ -1,0 +1,12 @@
+
+test.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	48 c7 c7 38 ac 60 55 	mov    $0x5560ac38,%rdi
+   7:	48 bd e4 5f 55 55 55 	movabs $0x555555555fe4,%rbp
+   e:	55 00 00 
+  11:	55                   	push   %rbp
+  12:	c3                   	retq   
