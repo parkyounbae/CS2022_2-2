@@ -6,7 +6,7 @@
 
 # UI Design
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%201.png)
+![Untitled](./Untitled%201.png)
 
 로그인 페이지 - 입력되는 아이디의 종류에 따라 학생메인페이지/관리자 메인페이지 로 이동합니다.
 
