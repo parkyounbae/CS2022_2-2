@@ -2,7 +2,7 @@
 
 # Scema Design
 
-![Untitled](/Untitled.png)
+![Untitled](./Untitled.png)
 
 # UI Design
 
