@@ -10,37 +10,37 @@
 
 로그인 페이지 - 입력되는 아이디의 종류에 따라 학생메인페이지/관리자 메인페이지 로 이동합니다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%202.png)
+![Untitled](./Untitled%202.png)
 
 학생메인 페이지 - 상단에는 다른 기능 페이지로 갈 수 있는 네비 바가 있습니다. 메인페이지에서 수업번호, 학수번호, 교과목 명을 이용해 수업을 검색 할 수 있으며 검색 결과는 하단에 표로 나타납니다. 표에는 수업에 대한 정보와 해당 수업을 신청하는 수강신청 버튼, 장바구니에 담아두는 희망 신청버튼이 존재합니다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%203.png)
+![Untitled](./Untitled%203.png)
 
 시간표 페이지 - 시간표 탭을 누르면 현재 수강신청을 해둔 과목에 대한 시간표를 볼 수 있습니다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%204.png)
+![Untitled](./Untitled%204.png)
 
 시간표 페이지 - 시간표 밑에는 현재 수강 신청한 과목들에 대한 정보를 표로 볼 수 있으며 해당 표를 통해 신청한 과목을 취소할 수 있습니다. 
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%205.png)
+![Untitled](./Untitled%205.png)
 
 희망 수업 페이지 - 해당 페이지에서는 장바구니에 담아놓은 과목에 대해 확인할 수 있습니다. 표에서 과목에 대한 정보를 볼 수 있으며 수강신청 버튼을 통해 수강신청을 진행 할 수 있습니다. 또한 장바구니에서 삭제도 가능합니다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%206.png)
+![Untitled](./Untitled%206.png)
 
 관리자 모드 메인 페이지 - 메인페이지의 주요기능은 수업 검색입니다. 수업을 검색할 수 있는 부분은 학생화면과 동일하지만 수강신청, 희망과목 버튼 대신 폐강버튼과 증원 버튼을 통해 수업에 대한 관리를 진행 할 수 있습니다. (증원 시 숫자만 입력할 수 있으며 기존의 정원보다 낮게 입력하는 경우는 생각하지 않았습니다.)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%207.png)
+![Untitled](./Untitled%207.png)
 
 설강 페이지 - 수업에 대한 정보를 입력해 새로운 수업을 생성 할 수 있는 페이지 입니다. 
 
 (중복되는 class_id, class_no 에 대해서는 고려하지 않음, 존재하지 않는 course_id, major_id, lecturer_id, room_id 에 대해서는 고려하지 않음, 시작시간과 끝나는시간이 정상적으로 입력된다는 가정, 시간 입력형식은 09:00/11:00/02:30 임, day_of_week 는 1부터 6까지 입력 가능하고 각각 월,화,수,목,금,온라인 에 해당한다.)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%208.png)
+![Untitled](./Untitled%208.png)
 
 학생 정보 조회 페이지 - 학번을 입력 한 뒤 조회 버튼을 누르면 해당 학생에 대한 정보가 표로 나열됨. 현재 상태를 변경할 수 있는 버튼 존재
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%209.png)
+![Untitled](./Untitled%209.png)
 
 과목통계 페이지 - 모든 과목에 대해 학생들의 평균 점수에 비해 적게 준 상위 10개 강의를 표시한다.
 
@@ -275,7 +275,7 @@ Class_tDAO, Class_timeDAO, CreditDAO 에는 SQL 반환값을 보다 수월하게
 
 페이지를 실제로 표현하는 jsp 파일과 Action 만을 위해 만들어진 jsp 파일로 나뉘어져 있으며 각각은 서로 GET, POST 로 데이터를 주고받으며 주어진 일을 수행합니다. 
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2010.png)
+![Untitled](./Untitled%2010.png)
 
 # 빌드 과정 및 실행 과정
 
@@ -295,28 +295,28 @@ Class_tDAO, Class_timeDAO, CreditDAO 에는 SQL 반환값을 보다 수월하게
 
 - 수업 검색 - class_no 를 선택하고 수업번호를 입력 한 뒤 검색한다. ex)10003
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2011.png)
+![Untitled](./Untitled%2011.png)
 
 - 수업 검색 - course_id 를 선택하고 학수번호를 입력 한 뒤 검색한다 ex)CIE3022
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2012.png)
+![Untitled](./Untitled%2012.png)
 
 - 수업 검색 - name 을 선택하고 이름을 입력 한 뒤 검색한다 ex) 데이
     
-    ![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2013.png)
+    ![Untitled](./Untitled%2013.png)
     
 
 ## 공용기능
 
 - 로그인 / 입력한 아이디의 종류에 따라 관리자 모드 또는 학생 모드로 진입
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2014.png)
+![Untitled](./Untitled%2014.png)
 
 ## 관리기능
 
 ### 관리자 로그인/로그아웃 (5점)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2015.png)
+![Untitled](./Untitled%2015.png)
 
 로그인 화면에서 관리자 아이디에 해당하는 정보를 입력하고 접속하면 관리자 페이지로 이동한다. (admin1, 123) / 로그인 이후 네비 바에 있는 로그아웃 버튼을 누르면 로그아웃 된다.
 
@@ -324,25 +324,25 @@ Class_tDAO, Class_timeDAO, CreditDAO 에는 SQL 반환값을 보다 수월하게
 
 - 과목 설강 및 강의실 조건 확인
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2016.png)
+![Untitled](./Untitled%2016.png)
 
 설강 페이지에서 수업 관련 데이터를 적은 뒤 등록 버튼누르기 
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2017.png)
+![Untitled](./Untitled%2017.png)
 
 강의실 수용인원을 초과할경우 실패
 
 - 과목 폐강
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2018.png)
+![Untitled](./Untitled%2018.png)
 
 과목 검색 이후 폐강버튼 클릭
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2019.png)
+![Untitled](./Untitled%2019.png)
 
 강의 삭제 성공 메시지
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2020.png)
+![Untitled](./Untitled%2020.png)
 
 이후 검색 및 수강신청 했던 학생의 수강신청 목록에서도 사라짐 (시간표의 asd 과목 사라짐)
 
@@ -350,79 +350,79 @@ Class_tDAO, Class_timeDAO, CreditDAO 에는 SQL 반환값을 보다 수월하게
 
 - 학생 조회 및 상태 변경
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2021.png)
+![Untitled](./Untitled%2021.png)
 
 학생의 학번을 입력한 뒤 검색버튼을 누르면 해당 학생에 대한 정보가 나온다.
 
 관리자는 이 기능을 통해 학생들의 시간표를 조회할 수 있다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2022.png)
+![Untitled](./Untitled%2022.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2023.png)
+![Untitled](./Untitled%2023.png)
 
 상태 변경 테이블에서 변경할 상태를 체크한 뒤 제출 버튼을 누른다. 이후 다시 그 학생을 검색하면 상태가 변경되어있다.
 
 - 과목 조회 및 증원
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2024.png)
+![Untitled](./Untitled%2024.png)
 
 검색 결과로 나온 과목 데이터표에서 증원 인풋값으로 현재 정원 수 보다 큰 숫자를 넣은 뒤 제출 버튼 클릭
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2025.png)
+![Untitled](./Untitled%2025.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2026.png)
+![Untitled](./Untitled%2026.png)
 
 이후 다시 검색하면 증원된 상태로 조회
 
 ### OLAP (25점)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2027.png)
+![Untitled](./Untitled%2027.png)
 
 ## 수강신청 기능
 
 ### 사용자 로그인/로그아웃 (5점)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2028.png)
+![Untitled](./Untitled%2028.png)
 
 알맞은 아이디와 비밀번호 입력시 로그인 성공
 
 ### 수강신청/취소 기능
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2029.png)
+![Untitled](./Untitled%2029.png)
 
 검색/장바구니 탭에서 수강신청 버튼을 눌렀을때 제한사항에 해당하지 않는다면 수강신청에 성공했다는 메시지 출력
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2030.png)
+![Untitled](./Untitled%2030.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2031.png)
+![Untitled](./Untitled%2031.png)
 
 이후 시간표/테이블 에서 신청 내역을 확인 할 수 있다.
 
 이때 시간표 밑에 있는 테이블의 수강 취소 버튼을 통해 수강취소를 할 수 있다.
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2032.png)
+![Untitled](./Untitled%2032.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2033.png)
+![Untitled](./Untitled%2033.png)
 
 수강 삭제 완료 메시지 이후 시간표에서 확인 할 수 없는 모습
 
 ### 장바구니 기능
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2034.png)
+![Untitled](./Untitled%2034.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2035.png)
+![Untitled](./Untitled%2035.png)
 
 수강편람의 검색 결과에서 희망신청 버튼을 누르면 희망 강의에 추가하였습니다. 메시지 출력
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%205.png)
+![Untitled](./Untitled%205.png)
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2036.png)
+![Untitled](./Untitled%2036.png)
 
 이후 희망페이지에서 희망 삭제 버튼을 누르면 희망 강의에서 삭제되었습니다. 메시지 출력
 
 ### 시간표 생성 기능
 
-![Untitled](%E1%84%83%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%90%E1%85%A5%E1%84%87%E1%85%A6%E1%84%8B%E1%85%B5%E1%84%89%E1%85%B3%20#Project1%20Milestone2%200271c8aa0a464885b1557c2f5d9c48a1/Untitled%2037.png)
+![Untitled](./Untitled%2037.png)
 
 신청한 강의에 따른 시간표를 출력해준다. 
 
