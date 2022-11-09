@@ -279,6 +279,13 @@ Class_tDAO, Class_timeDAO, CreditDAO 에는 SQL 반환값을 보다 수월하게
 
 # 빌드 과정 및 실행 과정
 
+인텔리제이 버전 : 2021.3
+MySQL 버전 : 8.0
+Tomcat : 9.0.68
+SDK Amazon Corretto version : 15.0.2
+Connectormysql-connector-java-8.0.20
+
+
 데모 영상에 사용된 아이디는 다음과 같습니다.
 
 학생 - ID: 2019038513, PW: 1234
