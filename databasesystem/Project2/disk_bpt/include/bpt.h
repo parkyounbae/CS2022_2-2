@@ -37,7 +37,7 @@ typedef struct Page{
     };
 }page;
 
-typedef struct Header_Page{
+typedef struct Header_Page{ // off_t long 형 정수
     off_t fpo;
     off_t rpo;
     int64_t num_of_pages;
