@@ -525,6 +525,7 @@ off_t insert_into_internal_as(off_t bumo, int left_index, int64_t key, off_t new
 
 int db_delete(int64_t key) {
 
+    // 데이터 베이스가 비어있거나, 지우려는 키가 존재하지 않는 경우 조사
     if (rt->num_of_keys == 0) {
         //printf("root is empty\n");
         return -1;
@@ -536,7 +537,9 @@ int db_delete(int64_t key) {
         return -1;
     }
     free(check);
+    // 해당 키를 지우기 위해 리프의 오프셋 찾기
     off_t deloff = find_leaf(key);
+    // delete
     delete_entry(key, deloff);
     return 0;
 
@@ -544,20 +547,25 @@ int db_delete(int64_t key) {
 
 void delete_entry(int64_t key, off_t deloff) {
 
+    // 해당 키 제거
     remove_entry_from_page(key, deloff);
 
+    // 변경된 노드가 루트라면?
     if (deloff == hp->rpo) {
         adjust_root(deloff);
         return;
     }
+
+    // 삭제된 페이지의 남아있는 노드의 수가 절반 이상일땐 그냥 끝
     page * not_enough = load_page(deloff);
     int check = not_enough->is_leaf ? cut(LEAF_MAX) : cut(INTERNAL_MAX);
     if (not_enough->num_of_keys >= check){
       free(not_enough);
       //printf("just delete\n");
       return;  
-    } 
+    }
 
+    // 남아 있는 노드의 수가 절반 이하일 때
     int neighbor_index, k_prime_index;
     off_t neighbor_offset, parent_offset;
     int64_t k_prime;
@@ -565,64 +573,76 @@ void delete_entry(int64_t key, off_t deloff) {
     page * parent = load_page(parent_offset);
 
     if (parent->next_offset == deloff) {
+        // 지워진 페이지가 children 중에서 첫번쩨 페이지 일떼?
         neighbor_index = -2;
+        // 이웃은 두번째 child
         neighbor_offset = parent->b_f[0].p_offset;
+        // 두번째 child의 첫번째 key
         k_prime = parent->b_f[0].key;
         k_prime_index = 0;
     }
     else if(parent->b_f[0].p_offset == deloff) {
+        // 지워진 페이지가 children 중에서 두번째 페이지 일떼?
         neighbor_index = -1;
+        // 이웃 노드는 첫번재 노드
         neighbor_offset = parent->next_offset;
         k_prime_index = 0;
         k_prime = parent->b_f[0].key;
     }
     else {
+        // 나머지
         int i;
-
+        // 지워진 페이지에 대한 인덱스 찾기
         for (i = 0; i <= parent->num_of_keys; i++)
             if (parent->b_f[i].p_offset == deloff) break;
+        // 지워진 노드의 왼쪽이 이웃 노드
         neighbor_index = i - 1;
         neighbor_offset = parent->b_f[i - 1].p_offset;
         k_prime_index = i;
         k_prime = parent->b_f[i].key;
     }
 
+    // 이웃 노드 불러옴
     page * neighbor = load_page(neighbor_offset);
     int max = not_enough->is_leaf ? LEAF_MAX : INTERNAL_MAX - 1;
     int why = neighbor->num_of_keys + not_enough->num_of_keys;
-    //printf("%d %d\n",why, max);
+
     if (why <= max) {
+        // (이웃의 키 + 지운 노드의 키) <= max
         free(not_enough);
         free(parent);
         free(neighbor);
         coalesce_pages(deloff, neighbor_index, neighbor_offset, parent_offset, k_prime);
     }
     else {
+        // (이웃의 키 + 지운 노드의 키) > max
         free(not_enough);
         free(parent);
         free(neighbor);
         redistribute_pages(deloff, neighbor_index, neighbor_offset, parent_offset, k_prime, k_prime_index);
-
     }
 
     return;
 
 }
 void redistribute_pages(off_t need_more, int nbor_index, off_t nbor_off, off_t par_off, int64_t k_prime, int k_prime_index) {
-    
+    // 이웃에게서 빌려오기
     page *need, *nbor, *parent;
     int i;
     need = load_page(need_more);
     nbor = load_page(nbor_off);
     parent = load_page(par_off);
     if (nbor_index != -2) {
-        
+        // 맨 왼쪽 아닐때
         if (!need->is_leaf) {
-            //printf("redis average interal\n");
+            // 리프가 아님
+            // need 한칸씩 밀어버림
             for (i = need->num_of_keys; i > 0; i--)
                 need->b_f[i] = need->b_f[i - 1];
-            
+
+            // need에 prime 넣음
             need->b_f[0].key = k_prime;
+            // 새로 들어온 키가 가리키는 값을 이웃의 제일 오른쪽이 가리키던 값으로 바꾼다
             need->b_f[0].p_offset = need->next_offset;
             need->next_offset = nbor->b_f[nbor->num_of_keys - 1].p_offset;
             page * child = load_page(need->next_offset);
@@ -655,7 +675,7 @@ void redistribute_pages(off_t need_more, int nbor_index, off_t nbor_off, off_t p
            
         }
         else {
-            //printf("redis leftmost internal\n");
+            //
             need->b_f[need->num_of_keys].key = k_prime;
             need->b_f[need->num_of_keys].p_offset = nbor->next_offset;
             page * child = load_page(need->b_f[need->num_of_keys].p_offset);
@@ -680,16 +700,17 @@ void redistribute_pages(off_t need_more, int nbor_index, off_t nbor_off, off_t p
 }
 
 void coalesce_pages(off_t will_be_coal, int nbor_index, off_t nbor_off, off_t par_off, int64_t k_prime) {
-    
+    // merge 를 해야하는 상황
     page *wbc, *nbor, *parent;
     off_t newp, wbf;
 
     if (nbor_index == -2) {
-        //printf("leftmost\n");
+        // 제일 왼쪽 일 때
         wbc = load_page(nbor_off); nbor = load_page(will_be_coal); parent = load_page(par_off);
         newp = will_be_coal; wbf = nbor_off;
     }
     else {
+        // 나머지 경우
         wbc = load_page(will_be_coal); nbor = load_page(nbor_off); parent = load_page(par_off);
         newp = nbor_off; wbf = will_be_coal;
     }
@@ -698,17 +719,20 @@ void coalesce_pages(off_t will_be_coal, int nbor_index, off_t nbor_off, off_t pa
     int le = wbc->num_of_keys;
     int i, j;
     if (!wbc->is_leaf) {
-        //printf("coal internal\n");
+        // 리프가 아니라면
+        // nbor에 k_prime 값 넣기
         nbor->b_f[point].key = k_prime;
         nbor->b_f[point].p_offset = wbc->next_offset;
         nbor->num_of_keys++;
 
+        // 그 다음에는 wbc에 있는 key를 nbor에 옮기기
         for (i = point + 1, j = 0; j < le; i++, j++) {
             nbor->b_f[i] = wbc->b_f[j];
             nbor->num_of_keys++;
             wbc->num_of_keys--;
         }
 
+        // 걔네들 + prime 의 부모를 새로운 노드(nbor)로 수정 (merge 니까 부모 수정해줘야함)
         for (i = point; i < nbor->num_of_keys; i++) {
             page * child = load_page(nbor->b_f[i].p_offset);
             child->parent_page_offset = newp;
@@ -718,10 +742,9 @@ void coalesce_pages(off_t will_be_coal, int nbor_index, off_t nbor_off, off_t pa
 
     }
     else {
-        //printf("coal leaf\n");
+        // 리프일때
         int range = wbc->num_of_keys;
         for (i = point, j = 0; j < range; i++, j++) {
-            
             nbor->records[i] = wbc->records[j];
             nbor->num_of_keys++;
             wbc->num_of_keys--;
@@ -744,6 +767,9 @@ void adjust_root(off_t deloff) {
     if (rt->num_of_keys > 0)
         return;
     if (!rt->is_leaf) {
+        // 지웠는데 루트의 데이터가 0 개임
+        // 루트가 리프가 아님
+        // 다음 노드를 새로운 루트로 지정하고 저장
         off_t nr = rt->next_offset;
         page * nroot = load_page(nr);
         nroot->parent_page_offset = 0;
@@ -761,6 +787,7 @@ void adjust_root(off_t deloff) {
         return;
     }
     else {
+        // 루트면? 처음 무의 상태로
         free(rt);
         rt = NULL;
         usetofree(hp->rpo);
@@ -776,16 +803,21 @@ void remove_entry_from_page(int64_t key, off_t deloff) {
     
     int i = 0;
     page * lp = load_page(deloff);
+    // leaf 라면
     if (lp->is_leaf) {
-        //printf("remove leaf key %ld\n", key);
+        // 해당 키에 대한 인덱스 찾기
         while (lp->records[i].key != key)
             i++;
 
+        // 배열 내에서 지우고
         for (++i; i < lp->num_of_keys; i++)
             lp->records[i - 1] = lp->records[i];
         lp->num_of_keys--;
+        // 변경사항 write
         pwrite(fd, lp, sizeof(page), deloff);
+        // 변경된 노드가 루트라면?
         if (deloff == hp->rpo) {
+            // 루트 다시 로드
             free(lp);
             free(rt);
             rt = load_page(deloff);
@@ -796,14 +828,18 @@ void remove_entry_from_page(int64_t key, off_t deloff) {
         return;
     }
     else {
-        //printf("remove interanl key %ld\n", key);
+        // leaf 가 아니라면
+        // 해당 키에 대한 인덱스 찾고
         while (lp->b_f[i].key != key)
             i++;
+        // 해당 키 삭제하고 write
         for (++i; i < lp->num_of_keys; i++)
             lp->b_f[i - 1] = lp->b_f[i];
         lp->num_of_keys--;
         pwrite(fd, lp, sizeof(page), deloff);
+        // 해당 노드가 루트라면
         if (deloff == hp->rpo) {
+            // 루트 다시 로드
             free(lp);
             free(rt);
             rt = load_page(deloff);
