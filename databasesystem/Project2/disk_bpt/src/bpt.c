@@ -6,7 +6,6 @@ page * rt = NULL; //root is declared as global
 
 int fd = -1; //fd is declared as global
 
-
 H_P * load_header(off_t off) {
     H_P * newhp = (H_P*)calloc(1, sizeof(H_P));
     if (sizeof(H_P) > pread(fd, newhp, sizeof(H_P), 0)) {
@@ -16,7 +15,6 @@ H_P * load_header(off_t off) {
     // 있으면 헤더 반환
     return newhp;
 }
-
 
 page * load_page(off_t off) {
     page* load = (page*)calloc(1, sizeof(page));
@@ -194,8 +192,6 @@ int cut(int length) {
         return length / 2 + 1;
 }
 
-
-
 void start_new_file(record rec) {
 
     page * root;
@@ -279,7 +275,6 @@ off_t insert_into_leaf(off_t leaf, record inst) {
     free(p);
     return leaf;
 }
-
 
 off_t insert_into_leaf_as(off_t leaf, record inst) {
 
@@ -625,6 +620,7 @@ void delete_entry(int64_t key, off_t deloff) {
     return;
 
 }
+
 void redistribute_pages(off_t need_more, int nbor_index, off_t nbor_off, off_t par_off, int64_t k_prime, int k_prime_index) {
     // 이웃에게서 빌려오기
     page *need, *nbor, *parent;
