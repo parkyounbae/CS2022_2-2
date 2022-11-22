@@ -97,40 +97,5 @@ public class Client2 {
 
         }
 
-//        try {
-//            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-//            System.out.print("Username: ");
-//            String id = input.readLine();
-//            String roomName = input.readLine();
-//
-//            socket = new Socket(args[0], Integer.parseInt(args[1])); // 서버 아이피와 포트번호로 접속
-//            writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-//            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//
-//            writer.println(id);
-//            writer.flush();
-//
-//            PrintThread thread = new PrintThread(socket, reader);
-//            thread.start();
-//
-//            String line;
-//            do {
-//                System.out.print("> ");
-//                line = input.readLine();
-//                if (line == null) break;
-//                writer.println(line);
-//                writer.flush();
-//            } while (true);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (writer != null) writer.close();
-//                if (reader != null) reader.close();
-//                if (socket != null) socket.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 }
