@@ -63,6 +63,10 @@ void freetouse(off_t fpo);
 int cut(int length);
 int parser();
 
+
+void print_tree();
+void print_tree_start(off_t page_off)
+
 void start_new_file(record rec);
 int db_insert(int64_t key, char * value);
 off_t insert_into_leaf(off_t leaf, record inst);

@@ -18,7 +18,7 @@ H_P * load_header(off_t off) {
 
 page * load_page(off_t off) {
     page* load = (page*)calloc(1, sizeof(page));
-    //if (off % sizeof(page) != 0) printf("load fail : page offset error\n");
+    if (off % sizeof(page) != 0) printf("load fail : page offset error\n"); //print
     if (sizeof(page) > pread(fd, load, sizeof(page), off)) {
         // 페이지 읽고 없으면 null
         return NULL;
@@ -131,7 +131,7 @@ off_t find_leaf(int64_t key) {
     //  rt->b_f[0].key, rt->b_f[0].p_offset, rt->is_leaf, hp->rpo);
 
     if (rt == NULL) {
-        //printf("Empty tree.\n");
+        printf("Empty tree.\n"); // print
         return 0;
     }
     p = load_page(loc); // 루트에 해당하는 페이지 로드
@@ -160,6 +160,38 @@ off_t find_leaf(int64_t key) {
     // 해당하는 오프셋 반환
     return loc;
 
+}
+
+void print_tree() {
+    if(rt == NULL) {
+        printf("EmptyTree\n");
+        return;
+    }
+
+    print_tree_start(rt);
+}
+
+void print_tree_start(off_t page_off) {
+    int i=0;
+    page * p;
+    p = load_page(page_off);
+
+    while(i < p->num_of_keys) {
+        printf("%ld ", p->b_f[i].key);
+    }
+    printf("\n");
+
+    if(p->is_leaf) {
+        return;
+    }
+
+    int page_index = 0;
+    print_tree_start(p->next_offset);
+    while (page_index < p->num_of_keys)
+    {
+        print_tree_start(p->b_f[i].p_offset);
+    }
+    
 }
 
 char * db_find(int64_t key) {
@@ -250,6 +282,80 @@ int db_insert(int64_t key, char * value) {
     //why double free?
     return 0;
 
+}
+
+void redistribution_pages_insert(off_t inserted_node, int nbor_index, off_t nbor_off, off_t par_off, int64_t k_prime, int k_prime_index) {
+    // 요소가 추가되어 재분배가 필요한 노드, 이웃 노드의 순서, (-2 -1 0 1 2 ..), 이웃 노드의 offset, 부모 오프셋, 옮겨갈 숫자, 부모에서 그 숫자의 인덱스
+    page *inserted, *nbor, *parent;
+    int i;
+    inserted = load_page(inserted_node);
+    nbor = load_page(nbor_off);
+    parent = load_page(par_off);
+
+    if(nbor_index != -2) {
+        // 맨 왼쪽이 아닐 때
+        if(!inserted->is_leaf) {
+            // leaf가 아님
+            // inserted의 제일 왼쪽 key를 nbor에 넘긴다.
+            // nbor의 맨 마지막 요소의 키를 k_prime 으로
+            nbor->b_f[nbor->num_of_keys].key = k_prime;
+            // nbor의 맨 마지막 요소의 오프셋을 inserted의 맨 앞 오프셋으로
+            nbor->b_f[nbor->num_of_keys].p_offset = inserted->next_offset;
+            // 해당 페이지 로드 후 부모를 이웃 노드로 수정해주고 저장
+            page * child = load_page(nbor->b_f[nbor->num_of_keys].p_offset);
+            child->parent_page_offset = nbor;
+            pwrite(fd,child,sizeof(page),nbor->b_f[nbor->num_of_keys].p_offset);
+            free(child);
+
+            // 부모의 요소를 바뀐 inserted의 맨 앞껄로 바꿔줌 
+            parent->b_f[k_prime_index].key = inserted->b_f[0].key; // todo 밑줄로 옮겨야 하는거 아닌가..
+            // inserted의 맨 처음 오프셋을 원래 두번째 꺼 였던걸로 바꿔줌
+            inserted->next_offset = inserted->b_f[0].p_offset;
+            // 이후 한칸씩 땡김
+            for(i=0 ; i<inserted->num_of_keys-1 ; i++) {
+                inserted->b_f[i] = inserted->b_f[i+1];
+            }
+        } else {
+            // leaf 일 때
+            // inserted 의 record 한칸씩 땡기고
+            nbor->records[nbor->num_of_keys] = inserted->records[0];
+            for(int i=0 ; i<inserted->num_of_keys-1 ; i++) {
+                inserted->records[i] = inserted->records[i+1];
+            }
+            parent->b_f[k_prime_index].key = inserted->records[0].key;
+        }
+    } else {
+        if(inserted->is_leaf) {
+            for(i = nbor->num_of_keys ; i>0 ; i--) {
+                nbor->records[i] = nbor->records[i-1];
+            }
+            nbor->records[0] = inserted->records[inserted->num_of_keys - 1];
+            inserted->records[inserted->num_of_keys-1].key = 0;
+            parent->b_f[k_prime_index].key = inserted->records[0].key;
+        } else {
+            for(i = nbor->num_of_keys ; i>0 ; i--) {
+                nbor->b_f[i] = nbor->b_f[i-1];
+            }
+            nbor->b_f[0].key = k_prime;
+            nbor->b_f[0].p_offset = nbor->next_offset;
+            nbor->next_offset = inserted->b_f[inserted->num_of_keys-1].p_offset;
+            page * child = load_page(nbor->next_offset);
+            child->parent_page_offset = nbor_off;
+            pwrite(fd,child,sizeof(page),nbor->next_offset);
+            free(child);
+            parent->b_f[k_prime_index].key = inserted->b_f[inserted->num_of_keys-1].key;
+        }
+    }
+
+    nbor->num_of_keys++;
+    inserted->num_of_keys--;
+
+    pwrite(fd,parent,sizeof(page),par_off);
+    pwrite(fd,nbor,sizeof(page),nbor_off);
+    pwrite(fd,inserted,sizeof(page),inserted_node);
+
+    free(parent); free(nbor); free(inserted);
+    return ;
 }
 
 off_t insert_into_leaf(off_t leaf, record inst) {
@@ -671,9 +777,12 @@ void redistribute_pages(off_t need_more, int nbor_index, off_t nbor_off, off_t p
            
         }
         else {
-            //
+            // 맨 왼쪽인데 리프 아님
+            // 오른쪽에 있는걸 하나 빌려와야함
+            // 내꺼 맨 끝에 일단 추가해버림
             need->b_f[need->num_of_keys].key = k_prime;
             need->b_f[need->num_of_keys].p_offset = nbor->next_offset;
+            // 그거 불러와서 부모도 수정
             page * child = load_page(need->b_f[need->num_of_keys].p_offset);
             child->parent_page_offset = need_more;
             pwrite(fd, child, sizeof(page), need->b_f[need->num_of_keys].p_offset);

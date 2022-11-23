@@ -29,6 +29,9 @@ int main(){
                 scanf("%ld", &input);
                 db_delete(input);
                 break;
+            case 'p':
+                print_tree();
+                break;
             case 'q':
                 while (getchar() != (int)'\n');
                 return EXIT_SUCCESS;
