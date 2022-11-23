@@ -17,9 +17,6 @@ public class Client {
         PrintWriter writer = null;
         BufferedReader reader = null;
 
-        PrintWriter fileWriter = null;
-        BufferedReader fileReader = null;
-
         String filePath = System.getProperty("user.dir") +"/Files";
 
         while (true) {
@@ -36,9 +33,6 @@ public class Client {
                 reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 fileSocket = new Socket(args[0], Integer.parseInt(args[2]));
-                fileWriter = new PrintWriter(new OutputStreamWriter(fileSocket.getOutputStream()));
-                fileReader = new BufferedReader(new InputStreamReader(fileSocket.getInputStream()));
-
                 DataInputStream dataInputStream = new DataInputStream(fileSocket.getInputStream());
                 DataOutputStream dataOutputStream = new DataOutputStream(fileSocket.getOutputStream());
 
@@ -49,7 +43,7 @@ public class Client {
                     PrintThread thread = new PrintThread(socket, reader,commandList[1],commandList[2]);
                     thread.start();
 
-                    FilePrintThread filePrintThread = new FilePrintThread(fileSocket,fileReader,commandList[1],commandList[2]);
+                    FilePrintThread filePrintThread = new FilePrintThread(fileSocket,commandList[1],commandList[2]);
                     filePrintThread.start();
 
                     String msg;
@@ -86,38 +80,10 @@ public class Client {
                                 e.printStackTrace();
                             }
                         } else if(msg.split(" ")[0].equals("#GET")) {
-                            msg = "@" + commandList[1] + " #GET";
-                            fileWriter.println(msg);
-                            fileWriter.flush();
-
-                            String fileToGet = input.readLine();
-                            fileWriter.println(fileToGet);
-                            fileWriter.flush();
-
-                            String fileNameToPut = dataInputStream.readUTF();
-                            File file = new File(pathWithName+"/"+fileNameToPut); // 여기에 경로 + 파일명
-                            file.createNewFile();
-                            System.out.println("File created.");
-                            long fileSize = dataInputStream.readLong();
-                            long data = 0;
-                            int length;
-                            byte[] buffer = new byte[1024];
-
-                            FileOutputStream fileOutputStream = new FileOutputStream(file);
-                            StringBuilder fileIndex = new StringBuilder();
-                            while((length = dataInputStream.read(buffer)) != -1) {
-                                fileOutputStream.write(buffer,0,length);
-                                data += length;
-                                fileIndex.append("#");
-                                System.out.println(fileIndex.toString());
-                                if(data == fileSize) break;
-                            }
-
-
-
+                            writer.println(msg);
+                            writer.flush();
                         } else if(msg.split(" ")[0].equals("#PUT")) {
-                            System.out.println("보낼 파일 이름을 입력해주세요.");
-                            String fileToPut = input.readLine();
+                            String fileToPut = msg.split(" ")[1];
                             File file = new File(pathWithName + "/" + fileToPut);
                             if(file.isFile()) {
                                 dataOutputStream.writeUTF(file.getName());
@@ -134,7 +100,6 @@ public class Client {
                                     fileIndex.append("#");
                                     System.out.println(fileIndex.toString());
                                 }
-
                             } else {
                                 System.out.println("해당 파일이 존재하지 않습니다.");
                             }
@@ -200,44 +165,54 @@ public class Client {
 
 class FilePrintThread extends Thread {
     private final Socket socket;
-    private final BufferedReader reader;
 
     private final String roomName;
     private final String userName;
+    private final DataInputStream dataInputStream;
+    private final DataOutputStream dataOutputStream;
+    private final String filePath;
 
-    public FilePrintThread(Socket socket, BufferedReader reader, String roomName, String userName) {
+    public FilePrintThread(Socket socket, String roomName, String userName) throws IOException {
         this.socket = socket;
-        this.reader = reader;
         this.roomName = roomName;
         this.userName = userName;
+        this.dataInputStream = new DataInputStream(socket.getInputStream());
+        this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        this.filePath = System.getProperty("user.dir") +"/Files/"+userName;
     }
 
     @Override
     public void run() {
         try {
-            String line;
-            while((line = this.reader.readLine()) != null) {
-                System.out.println("\r\n" +line);
+            while (true) {
+                if (dataInputStream.available() != 0) {
+                    String fileNameToPut = dataInputStream.readUTF();
+                    File file = new File(filePath+"/"+fileNameToPut); // 여기에 경로 + 파일명
+                    file.createNewFile();
+                    System.out.println("File created.");
+                    long fileSize = dataInputStream.readLong();
+                    long data = 0;
+                    int length;
+                    byte[] buffer = new byte[1024];
 
-//                System.out.println("test : " + line);
-//                String[] lineList = line.split(" ");
-//                if(lineList[0].equals("#FAIL") && lineList[1].equals(this.userName)) {
-//                    try {
-//                        if (this.reader != null) this.reader.close();
-//                        if (this.socket != null) this.socket.close();
-//                        break;
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else  {
-//                    System.out.println("\r\n" +line);
-//                }
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("진행도 : #");
+                    while((length = dataInputStream.read(buffer)) != -1) {
+                        fileOutputStream.write(buffer,0,length);
+                        data += length;
+
+                        System.out.println(stringBuilder.toString());
+                        stringBuilder.append("#");
+
+                        if(data == fileSize) break;
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (this.reader != null) this.reader.close();
                 if (this.socket != null) this.socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -265,8 +240,7 @@ class PrintThread extends Thread {
         try {
             String line;
             while((line = this.reader.readLine()) != null) {
-                System.out.println("test : " + line);
-                String[] lineList = line.split(" ");
+                String[] lineList = line.split(" ",3);
                 if(lineList[0].equals("#FAIL") && lineList[1].equals(this.userName)) {
                     try {
                         if (this.reader != null) this.reader.close();
@@ -276,7 +250,7 @@ class PrintThread extends Thread {
                         e.printStackTrace();
                     }
                 } else  {
-                    System.out.println("\r\n" +line);
+                    System.out.println(line);
                 }
             }
         } catch (IOException e) {
