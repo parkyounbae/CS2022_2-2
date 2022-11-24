@@ -273,8 +273,57 @@ int db_insert(int64_t key, char * value) {
         // 리프에 자리가 있다면 넣고 끝
         insert_into_leaf(leaf, nr);
         free(leafp);
+
+        // redistribution 을 할 수 있는지 확인
+        // 조건1 - 인서트가 일어난 리프의 요소 갯수가 절반을 넘는지. 
+        if(leafp->num_of_keys > cut(LEAF_MAX)) {
+            // 넘는다면 이웃에 대한 정보를 불러온다. 
+            int neighbor_index, k_prime_index;
+            off_t neighbor_offset, parent_offset;
+            int64_t k_prime;
+            parent_offset = leafp->parent_page_offset;
+            page * parent = load_page(parent_offset);
+
+            // 만약에 인서트가 일어난 리프가 맨 왼쪽이라면 
+            if(parent->next_offset == leafp) {
+                // 이웃 인덱스 = -2
+                neighbor_index = -2;
+                neighbor_offset = parent->b_f[0].p_offset;
+                k_prime = parent->b_f[0].key;
+                k_prime_index = 0;
+            }else if(parent->b_f[0].p_offset == leafp) {
+                // 지워진 페이지가 children 중에서 두번째 페이지 일떼?
+                neighbor_index = -1;
+                // 이웃 노드는 첫번재 노드
+                neighbor_offset = parent->next_offset;
+                k_prime_index = 0;
+                k_prime = parent->b_f[0].key;
+            }
+            else {
+                // 나머지
+                int i;
+                // 지워진 페이지에 대한 인덱스 찾기
+                for (i = 0; i <= parent->num_of_keys; i++)
+                    if (parent->b_f[i].p_offset == leafp) break;
+                // 지워진 노드의 왼쪽이 이웃 노드
+                neighbor_index = i - 1;
+                neighbor_offset = parent->b_f[i - 1].p_offset;
+                k_prime_index = i;
+                k_prime = parent->b_f[i].key;
+            }
+
+            // 이웃노드 갯수 가 
+            page * neighbor = load_page(neighbor_offset);
+            
+            if(neighbor->num_of_keys < cut(LEAF_MAX)) {
+                free(neighbor);
+                free(leafp);
+                free(parent);
+                redistribution_pages_insert(leafp,neighbor_index,neighbor_offset,parent_offset,k_prime,k_prime_index);
+            }
+        }
         return 0;
-    }
+    } 
 
     // 리프에 자리가 없다면
     insert_into_leaf_as(leaf, nr);
