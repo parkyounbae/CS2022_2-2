@@ -600,6 +600,56 @@ off_t insert_into_internal(off_t bumo, int left_index, int64_t key, off_t newp) 
     parent->b_f[left_index + 1].key = key;
     parent->b_f[left_index + 1].p_offset = newp;
     parent->num_of_keys++;
+
+    if(bumo != hp->rpo) {
+        if(parent->num_of_keys > cut(INTERNAL_MAX)) {
+            // 남아 있는 노드의 수가 절반 이하일 때
+            int neighbor_index, k_prime_index;
+            off_t neighbor_offset, grand_parent_offset;
+            int64_t k_prime;
+            grand_parent_offset = parent->parent_page_offset;
+            page * grand_parent = load_page(grand_parent_offset);
+
+            if (grand_parent->next_offset == parent) {
+                // 지워진 페이지가 children 중에서 첫번쩨 페이지 일떼?
+                neighbor_index = -2;
+                // 이웃은 두번째 child
+                neighbor_offset = grand_parent->b_f[0].p_offset;
+                // 두번째 child의 첫번째 key
+                k_prime = grand_parent->b_f[0].key;
+                k_prime_index = 0;
+            }
+            else if(grand_parent->b_f[0].p_offset == parent) {
+                // 지워진 페이지가 children 중에서 두번째 페이지 일떼?
+                neighbor_index = -1;
+                // 이웃 노드는 첫번재 노드
+                neighbor_offset = grand_parent->next_offset;
+                k_prime_index = 0;
+                k_prime = grand_parent->b_f[0].key;
+            }
+            else {
+                // 나머지
+                int i;
+                // 지워진 페이지에 대한 인덱스 찾기
+                for (i = 0; i <= grand_parent->num_of_keys; i++)
+                    if (grand_parent->b_f[i].p_offset == parent) break;
+                // 지워진 노드의 왼쪽이 이웃 노드
+                neighbor_index = i - 1;
+                neighbor_offset = grand_parent->b_f[i - 1].p_offset;
+                k_prime_index = i;
+                k_prime = grand_parent->b_f[i].key;
+            }
+
+            // 이웃 노드 불러옴
+            page * neighbor = load_page(neighbor_offset);
+            if(neighbor->num_of_keys < cut(INTERNAL_MAX)) {
+                free(neighbor);
+                free(grand_parent);
+                redistribution_pages_insert(parent,neighbor_index,neighbor_offset,grand_parent_offset,k_prime,k_prime_index);
+            }
+        }
+    }
+
     pwrite(fd, parent, sizeof(page), bumo);
     free(parent);
 
