@@ -168,30 +168,43 @@ void print_tree() {
         return;
     }
 
-    print_tree_start(rt);
+    print_tree_start(hp->rpo);
 }
 
 void print_tree_start(off_t page_off) {
+    // 출력할 페이지의 오프셋을 넘겨받고 페이지 로드
     int i=0;
     page * p;
     p = load_page(page_off);
 
-    while(i < p->num_of_keys) {
-        printf("%ld ", p->b_f[i].key);
-    }
-    printf("\n");
-
     if(p->is_leaf) {
+        // 넘겨받은 페이지가 리프라면 출력하고 끝
+        printf("leaf ");
+        while(i < p->num_of_keys) {
+            printf("%lld ", p->records[i].key);
+            i++;
+        }
+        printf("\n");
         return;
+    } else {
+        // 넘겨받은 페이지가 인터널이라면 일단 출력하고
+        printf("internal "); 
+        while(i < p->num_of_keys) {
+                printf("%lld ", p->b_f[i].key);
+                i++;
+            }
+            printf("\n");
     }
 
+    // 자식 페이지에 대해서 재귀적으로 출력 다시
     int page_index = 0;
     print_tree_start(p->next_offset);
     while (page_index < p->num_of_keys)
     {
-        print_tree_start(p->b_f[i].p_offset);
+        printf("%d / %d : ", page_index, p->num_of_keys); // 현재 페이지/전체 페이지 : 
+        print_tree_start(p->b_f[page_index].p_offset);
+        page_index++;
     }
-    
 }
 
 char * db_find(int64_t key) {
@@ -273,10 +286,11 @@ int db_insert(int64_t key, char * value) {
         // 리프에 자리가 있다면 넣고 끝
         insert_into_leaf(leaf, nr);
         free(leafp);
+        leafp = load_page(leaf);
 
         // redistribution 을 할 수 있는지 확인
         // 조건1 - 인서트가 일어난 리프의 요소 갯수가 절반을 넘는지. 
-        if(leafp->num_of_keys > cut(LEAF_MAX)) {
+        if(leafp->num_of_keys == LEAF_MAX && leaf!=hp->rpo) {
             // 넘는다면 이웃에 대한 정보를 불러온다. 
             int neighbor_index, k_prime_index;
             off_t neighbor_offset, parent_offset;
@@ -285,13 +299,13 @@ int db_insert(int64_t key, char * value) {
             page * parent = load_page(parent_offset);
 
             // 만약에 인서트가 일어난 리프가 맨 왼쪽이라면 
-            if(parent->next_offset == leafp) {
+            if(parent->next_offset == leaf) {
                 // 이웃 인덱스 = -2
                 neighbor_index = -2;
                 neighbor_offset = parent->b_f[0].p_offset;
                 k_prime = parent->b_f[0].key;
                 k_prime_index = 0;
-            }else if(parent->b_f[0].p_offset == leafp) {
+            }else if(parent->b_f[0].p_offset == leaf) {
                 // 지워진 페이지가 children 중에서 두번째 페이지 일떼?
                 neighbor_index = -1;
                 // 이웃 노드는 첫번재 노드
@@ -304,7 +318,7 @@ int db_insert(int64_t key, char * value) {
                 int i;
                 // 지워진 페이지에 대한 인덱스 찾기
                 for (i = 0; i <= parent->num_of_keys; i++)
-                    if (parent->b_f[i].p_offset == leafp) break;
+                    if (parent->b_f[i].p_offset == leaf) break;
                 // 지워진 노드의 왼쪽이 이웃 노드
                 neighbor_index = i - 1;
                 neighbor_offset = parent->b_f[i - 1].p_offset;
@@ -312,16 +326,19 @@ int db_insert(int64_t key, char * value) {
                 k_prime = parent->b_f[i].key;
             }
 
-            // 이웃노드 갯수 가 
+            // 이웃노드 갯수 가 맥스보다 작다면
             page * neighbor = load_page(neighbor_offset);
             
-            if(neighbor->num_of_keys < cut(LEAF_MAX)) {
-                free(neighbor);
-                free(leafp);
-                free(parent);
-                redistribution_pages_insert(leafp,neighbor_index,neighbor_offset,parent_offset,k_prime,k_prime_index);
+            free(neighbor);
+            free(leafp);
+            free(parent);
+
+            if(neighbor->num_of_keys < LEAF_MAX) {
+                redistribution_pages_insert(leaf,neighbor_index,neighbor_offset,parent_offset,k_prime,k_prime_index);
             }
+            return 0;
         }
+        free(leafp);
         return 0;
     } 
 
@@ -352,7 +369,7 @@ void redistribution_pages_insert(off_t inserted_node, int nbor_index, off_t nbor
             nbor->b_f[nbor->num_of_keys].p_offset = inserted->next_offset;
             // 해당 페이지 로드 후 부모를 이웃 노드로 수정해주고 저장
             page * child = load_page(nbor->b_f[nbor->num_of_keys].p_offset);
-            child->parent_page_offset = nbor;
+            child->parent_page_offset = nbor_off;
             pwrite(fd,child,sizeof(page),nbor->b_f[nbor->num_of_keys].p_offset);
             free(child);
 
@@ -499,7 +516,7 @@ off_t insert_into_leaf_as(off_t leaf, record inst) {
     pwrite(fd, ol, sizeof(page), leaf);
     free(ol);
     free(nl);
-    //printf("split_leaf is complete\n");
+    printf("split_leaf is complete\n");
 
     // new leaf 의 첫번째 key 부모 페이지에 추가
     return insert_into_parent(leaf, new_key, new_leaf);
@@ -558,6 +575,7 @@ int get_left_index(off_t left) {
 
 off_t insert_into_new_root(off_t old, int64_t key, off_t newp) {
     // 새로운 루트노드 생성
+    printf("new node ! \n"); // todo
     off_t new_root;
     new_root = new_page();
     page * nr = load_page(new_root);
@@ -602,15 +620,15 @@ off_t insert_into_internal(off_t bumo, int left_index, int64_t key, off_t newp) 
     parent->num_of_keys++;
 
     if(bumo != hp->rpo) {
-        if(parent->num_of_keys > cut(INTERNAL_MAX)) {
-            // 남아 있는 노드의 수가 절반 이하일 때
+        if(parent->num_of_keys == INTERNAL_MAX) {
+            // 삽입이 일어난 페이지의 노드 수가 맥스와 같을때
             int neighbor_index, k_prime_index;
             off_t neighbor_offset, grand_parent_offset;
             int64_t k_prime;
             grand_parent_offset = parent->parent_page_offset;
             page * grand_parent = load_page(grand_parent_offset);
 
-            if (grand_parent->next_offset == parent) {
+            if (grand_parent->next_offset == bumo) {
                 // 지워진 페이지가 children 중에서 첫번쩨 페이지 일떼?
                 neighbor_index = -2;
                 // 이웃은 두번째 child
@@ -619,7 +637,7 @@ off_t insert_into_internal(off_t bumo, int left_index, int64_t key, off_t newp) 
                 k_prime = grand_parent->b_f[0].key;
                 k_prime_index = 0;
             }
-            else if(grand_parent->b_f[0].p_offset == parent) {
+            else if(grand_parent->b_f[0].p_offset == bumo) {
                 // 지워진 페이지가 children 중에서 두번째 페이지 일떼?
                 neighbor_index = -1;
                 // 이웃 노드는 첫번재 노드
@@ -632,7 +650,7 @@ off_t insert_into_internal(off_t bumo, int left_index, int64_t key, off_t newp) 
                 int i;
                 // 지워진 페이지에 대한 인덱스 찾기
                 for (i = 0; i <= grand_parent->num_of_keys; i++)
-                    if (grand_parent->b_f[i].p_offset == parent) break;
+                    if (grand_parent->b_f[i].p_offset == bumo) break;
                 // 지워진 노드의 왼쪽이 이웃 노드
                 neighbor_index = i - 1;
                 neighbor_offset = grand_parent->b_f[i - 1].p_offset;
@@ -642,10 +660,10 @@ off_t insert_into_internal(off_t bumo, int left_index, int64_t key, off_t newp) 
 
             // 이웃 노드 불러옴
             page * neighbor = load_page(neighbor_offset);
-            if(neighbor->num_of_keys < cut(INTERNAL_MAX)) {
+            if(neighbor->num_of_keys < INTERNAL_MAX) {
                 free(neighbor);
                 free(grand_parent);
-                redistribution_pages_insert(parent,neighbor_index,neighbor_offset,grand_parent_offset,k_prime,k_prime_index);
+                redistribution_pages_insert(bumo,neighbor_index,neighbor_offset,grand_parent_offset,k_prime,k_prime_index);
             }
         }
     }

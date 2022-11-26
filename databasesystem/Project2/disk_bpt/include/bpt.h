@@ -15,6 +15,8 @@
 #define LEAF_MAX 31
 #define INTERNAL_MAX 248
 
+
+
 typedef struct record{
     int64_t key;
     char value[120];
@@ -65,10 +67,11 @@ int parser();
 
 
 void print_tree();
-void print_tree_start(off_t page_off)
+void print_tree_start(off_t page_off);
 
 void start_new_file(record rec);
 int db_insert(int64_t key, char * value);
+void redistribution_pages_insert(off_t inserted_node, int nbor_index, off_t nbor_off, off_t par_off, int64_t k_prime, int k_prime_index);
 off_t insert_into_leaf(off_t leaf, record inst);
 off_t insert_into_leaf_as(off_t leaf, record inst);
 off_t insert_into_parent(off_t old, int64_t key, off_t newp);
