@@ -774,10 +774,10 @@ void delete_entry(int64_t key, off_t deloff) {
         return;
     }
 
-    // 삭제된 페이지의 남아있는 노드의 수가 절반 이상일땐 그냥 끝
+    // 삭제된 페이지의 남아있는 노드의 수가 1/4 이상일땐 그냥 끝
     page * not_enough = load_page(deloff);
-    int check = not_enough->is_leaf ? cut(LEAF_MAX) : cut(INTERNAL_MAX);
-    if (not_enough->num_of_keys >= check){
+    int check = not_enough->is_leaf ? cut(cut(LEAF_MAX)) : cut(cut(INTERNAL_MAX));
+    if (not_enough->num_of_keys > check){
       free(not_enough);
       //printf("just delete\n");
       return;  
@@ -825,19 +825,24 @@ void delete_entry(int64_t key, off_t deloff) {
     int max = not_enough->is_leaf ? LEAF_MAX : INTERNAL_MAX - 1;
     int why = neighbor->num_of_keys + not_enough->num_of_keys;
 
-    if (why <= max) {
-        // (이웃의 키 + 지운 노드의 키) <= max
+    if (why <= cut(max)) {
+        // (이웃의 키 + 지운 노드의 키) <= max/2
         free(not_enough);
         free(parent);
         free(neighbor);
         coalesce_pages(deloff, neighbor_index, neighbor_offset, parent_offset, k_prime);
     }
-    else {
+    else if (neighbor->num_of_keys > not_enough->num_of_keys) {
         // (이웃의 키 + 지운 노드의 키) > max
+        // 이웃의 키가 나보다 많을 때에만 재분배 일어남
         free(not_enough);
         free(parent);
         free(neighbor);
         redistribute_pages(deloff, neighbor_index, neighbor_offset, parent_offset, k_prime, k_prime_index);
+    } else {
+        free(not_enough);
+        free(parent);
+        free(neighbor);
     }
 
     return;
