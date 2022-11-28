@@ -41,7 +41,7 @@ public class Client {
                 DataInputStream dataInputStream = new DataInputStream(fileSocket.getInputStream());
                 DataOutputStream dataOutputStream = new DataOutputStream(fileSocket.getOutputStream());
 
-                if(commandList[0].equals("#CREATE")) {
+                if(commandList[0].equals("#CREATE") || commandList[0].equals("#JOIN")) {
                     // 입력받은 명령어가 생성일 경우
                     // 생성 명령어 서버로 전송
                     writer.println(fullCommand);
@@ -143,105 +143,6 @@ public class Client {
                             writer.flush();
                         }
                     }
-                } else if (commandList[0].equals("#JOIN"))
-                {
-                    // 입력받은 명령어가 참여일 경우
-                    // 참여 명령어 서버로 전송
-                    writer.println(fullCommand);
-                    writer.flush();
-
-                    // 서버에서 들려오는 채팅을 읽기 위해 쓰레드 생성
-                    PrintThread thread = new PrintThread(socket, reader);
-                    thread.start();
-
-                    // 서버에서 오는 파일을 읽기 위해 쓰레드 생성
-                    FilePrintThread filePrintThread = new FilePrintThread(fileSocket,commandList[2]);
-                    filePrintThread.start();
-
-                    // 받은 파일을 저장할 폴더 생성
-                    String pathWithName = filePath + "/" +commandList[2];
-                    File folder = new File(pathWithName);
-
-                    if(!folder.exists()) {
-                        try {
-                            folder.mkdir();
-                        } catch (Exception e) {
-                            e.getStackTrace();
-                        }
-                    }
-
-                    String msg;
-                    while (true) {
-                        // 소켓이 열려 있는 한 계속 반복
-                        if(socket.isClosed()) {
-                            writer.close();
-                            break;
-                        }
-
-                        // 유저 입력 받기
-                        msg = input.readLine();
-
-                        // 각각 명령어들이 있고 명령어가 입력되었을 경우 각각의 일을 수행한다.
-                        // 명령어가 아닌 경우에는 서버에 채팅 내용을 전달한다.
-                        if(msg.equals("#EXIT")) {
-                            // 입력받은 값의 처음이 exit일 경우
-                            // exit + 채팅방 이름 + 사용자 이름 을 서버로 전달
-                            msg = msg + " " + commandList[1] + " " + commandList[2];
-                            writer.println(msg);
-                            writer.flush();
-
-                            // 소켓, writer, reader 닫기
-                            try {
-                                if (writer != null) writer.close();
-                                if (reader != null) reader.close();
-                                if (socket != null) socket.close();
-                                break;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else if(msg.split(" ")[0].equals("#GET")) {
-                            // 겟 + 파일이름 서버에 전달
-                            writer.println(msg);
-                            writer.flush();
-                        } else if(msg.split(" ")[0].equals("#PUT")) {
-                            // 서버에 풋 명령어 전달
-                            writer.println("#PUT");
-                            // 전달받은 파일 이름 을 통해 해당 파일 불러오기
-                            String fileToPut = msg.split(" ")[1];
-                            File file = new File(pathWithName + "/" + fileToPut);
-                            if(file.isFile()) {
-                                // 해당 파일이 존재한다면 해당 파일의 이름과 파일의 길이를 서버에 전달
-                                dataOutputStream.writeUTF(file.getName());
-                                FileInputStream fileInputStream = new FileInputStream(file);
-                                dataOutputStream.writeLong(file.length());
-
-                                int length;
-                                byte[] buffer = new byte[1024];
-
-                                // 파일을 쪼개서 서버로 전송 시작
-                                StringBuilder fileIndex = new StringBuilder();
-                                fileIndex.append("파일 전송 시작 : ");
-                                while ((length = fileInputStream.read(buffer))!=-1) {
-                                    dataOutputStream.write(buffer,0,length);
-                                    dataOutputStream.flush();
-                                    fileIndex.append("#");
-                                    System.out.println(fileIndex.toString());
-                                }
-                                System.out.println("파일 전송 완료!");
-                            } else {
-                                System.out.println("해당 파일이 존재하지 않습니다.");
-                            }
-
-                        } else if(msg.split(" ")[0].equals("#STATUS")) {
-                            msg = "#STATUS";
-                            writer.println(msg);
-                            writer.flush();
-                        } else {
-                            msg = "[@" + commandList[1] + "] " + commandList[2] + " : " + msg;
-                            writer.println(msg);
-                            writer.flush();
-                        }
-                    }
                 } else {
                     System.out.println("WRONG COMMAND");
                 }
@@ -263,7 +164,7 @@ class FilePrintThread extends Thread {
     public FilePrintThread(Socket socket, String userName) throws IOException {
         this.socket = socket;
         this.dataInputStream = new DataInputStream(socket.getInputStream());
-        this.filePath = System.getProperty("user.dir") +"/Files/"+userName;
+        this.filePath = "../Files/"+userName;
     }
 
     @Override
@@ -335,13 +236,13 @@ class PrintThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+
         } finally {
             try {
                 if (this.reader != null) this.reader.close();
                 if (this.socket != null) this.socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+
             }
         }
     }

@@ -47,7 +47,6 @@ class FileThread extends Thread {
     private String roomName; // 현재 접속된 방 이름 정보
     private String id; // 현재 접속된 사람
 
-    public static final HashMap<String, PrintWriter> socketMap = new HashMap<>(); // (사람이름 + 소켓)이 저장되는 맵
     public static final HashMap<String, String> idWithRoom = new HashMap<>(); // (사람이름 + 방 이름)이 저장되는 맵
     public static final HashMap<String, String> fileWithRoom = new HashMap<>(); // (파일이름 + 방 이름)이 저장되는 맵
 
@@ -64,10 +63,9 @@ class FileThread extends Thread {
     // 객체를 생성할때 전달받은 소켓을 이용해 스트림을 뚫어둔다.
     public FileThread(Socket socket) throws IOException {
         this.socket = socket;
-        //this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.dataInputStream = new DataInputStream(socket.getInputStream());
         this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        this.filePath = "../Files/ServerFiles";// System.getProperty("user.dir") +"/Files/ServerFiles";
+        this.filePath = "../Files/ServerFiles";
     }
 
     // 파일을 보내는 함수
@@ -267,7 +265,7 @@ class ChatThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+
         } finally {
             synchronized (socketMap) {
                 socketMap.remove(this.id);
@@ -281,7 +279,7 @@ class ChatThread extends Thread {
                     this.socket.close();
                 }
             } catch (IOException e2) {
-                e2.printStackTrace();
+
             }
         }
     }
