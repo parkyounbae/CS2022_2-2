@@ -12,10 +12,10 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <string.h>
-//#define LEAF_MAX 31
-//#define INTERNAL_MAX 248
-#define LEAF_MAX 5
-#define INTERNAL_MAX 5
+#define LEAF_MAX 31
+#define INTERNAL_MAX 248
+//#define LEAF_MAX 5
+//#define INTERNAL_MAX 5
 
 
 typedef struct record{
