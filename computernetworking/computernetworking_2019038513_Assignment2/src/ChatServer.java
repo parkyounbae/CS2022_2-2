@@ -103,6 +103,10 @@ class FileThread extends Thread {
     public void run() {
         try {
             while (true) {
+                if(this.socket.isClosed()) {
+                    // System.out.println("file socket closed");
+                    break;
+                }
                 // datainputstream 에서 반응이 있다면?
                 if (dataInputStream.available() != 0) {
                     // 사용자가 보냄 파일 이름 전달 받고

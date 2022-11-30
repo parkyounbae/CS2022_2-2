@@ -93,6 +93,7 @@ public class Client {
                                 if (writer != null) writer.close();
                                 if (reader != null) reader.close();
                                 if (socket != null) socket.close();
+                                if (fileSocket != null) fileSocket.close();
                                 break;
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -172,6 +173,10 @@ class FilePrintThread extends Thread {
         // 파일을 받기 위해 항시적으로 쓰레드를 돌림
         try {
             while (true) {
+                if(this.socket.isClosed()) {
+                    System.out.println("file socket closed");
+                    break;
+                }
                 if (dataInputStream.available() != 0) {
                     // 반응이 오면 해당하는 파일 새로 생성후 쪼개져서 오는 파일을 합치면서 받아옴
                     String fileNameToPut = dataInputStream.readUTF();
