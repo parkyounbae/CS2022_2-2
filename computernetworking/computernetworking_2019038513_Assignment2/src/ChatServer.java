@@ -69,7 +69,7 @@ class FileThread extends Thread {
     }
 
     // 파일을 보내는 함수
-    public void sendFile(String fileToPut) {
+    public int sendFile(String fileToPut) {
         // 보낼 파일의 경로아 이름을 통해 불러온다
         File file = new File(filePath + "/" + fileToPut);
         try {
@@ -89,13 +89,16 @@ class FileThread extends Thread {
                     dataOutputStream.write(buffer,0,length);
                     dataOutputStream.flush();
                 }
-
+                System.out.println("파일 전송 완료");
+                return 1;
             } else {
                 System.out.println("해당 파일이 존재하지 않습니다.");
+                return 0;
             }
         } catch (Exception e) {
             e.getStackTrace();
         }
+        return 0;
     }
 
     // 파일을 받는 부분은 지속적으로 요청을 기다려야 하기 때문에 쓰레드로 돌린다.
@@ -261,7 +264,10 @@ class ChatThread extends Thread {
                     broadcastOne(line,this.id);
                 } else if (line.split(" ")[0].equals("#GET")) {
                     // 겟이면 sendFile 함수 호출
-                    fileThread.sendFile(line.split(" ")[1]);
+                    int result = fileThread.sendFile(line.split(" ")[1]);
+                    if(result == 0) {
+                        broadcastOne("해당 파일이 존재하지 않습니다. ", this.id);
+                    }
                 } else if(line.split(" ")[0].equals("#PUT")) {
                     System.out.println("put 요청");
                 } else {
@@ -305,7 +311,7 @@ class ChatThread extends Thread {
         synchronized (idWithRoom) {
             // for 문을 돌면서 해당하는 방 이름을 가지고 있는 아이디에게 모두 방송함
            for(Map.Entry<String, String> temp : idWithRoom.entrySet()) {
-                if(temp.getValue().equals(roomName)) {
+                if(temp.getValue().equals(roomName) && !temp.getKey().equals(this.id)) {
                     synchronized (socket) {
                         PrintWriter writer = socketMap.get(temp.getKey());
                         writer.println(message);

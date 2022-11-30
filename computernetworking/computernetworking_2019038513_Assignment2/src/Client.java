@@ -174,7 +174,7 @@ class FilePrintThread extends Thread {
         try {
             while (true) {
                 if(this.socket.isClosed()) {
-                    System.out.println("file socket closed");
+                    // System.out.println("file socket closed");
                     break;
                 }
                 if (dataInputStream.available() != 0) {
